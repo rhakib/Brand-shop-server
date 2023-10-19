@@ -33,62 +33,90 @@ async function run() {
     const brandDatabase = client.db('productDB').collection('Brands')
     const cartDatabase = client.db('productDB').collection('Cart')
 
-    app.get('/user', async(req, res)=>{
-        const cursor = userdatabase.find()
-        const result = await cursor.toArray()
-        res.send(result)
+    app.get('/user', async (req, res) => {
+      const cursor = userdatabase.find()
+      const result = await cursor.toArray()
+      res.send(result)
     })
 
-    app.post('/user', async(req, res)=>{
-        const user = req.body;
-        console.log(user);
-        const result = await userdatabase.insertOne(user)
-        res.send(result)
-
-    })
-    
-    app.get('/addproduct', async(req, res)=>{
-        const cursor = productDatabase.find()
-        const result = await cursor.toArray()
-        res.send(result)
-    })
-    app.get('/addproduct', async(req, res)=>{
-        const cursor = productDatabase.find()
-        const result = await cursor.toArray()
-        res.send(result)
-    })
-
-    app.post('/addproduct', async(req, res)=>{
-        const product = req.body;
-        const result = await productDatabase.insertOne(product)
-        res.send(result)
+    app.post('/user', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await userdatabase.insertOne(user)
+      res.send(result)
 
     })
 
-    app.get('/brands', async(req, res)=>{
-        const cursor = brandDatabase.find()
-        const result = await cursor.toArray()
-        res.send(result)
+    app.get('/addproduct', async (req, res) => {
+      const cursor = productDatabase.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/addproduct', async (req, res) => {
+      const cursor = productDatabase.find()
+      const result = await cursor.toArray()
+      res.send(result)
     })
 
-    app.post('/cart', async(req, res)=>{
+    app.post('/addproduct', async (req, res) => {
+      const product = req.body;
+      const result = await productDatabase.insertOne(product)
+      res.send(result)
+
+    })
+
+    app.get('/brands', async (req, res) => {
+      const cursor = brandDatabase.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.post('/cart', async (req, res) => {
       const cart = req.body;
       const result = await cartDatabase.insertOne(cart)
       res.send(result)
     })
 
-    app.get('/cart', async(req, res)=>{
+    app.get('/cart', async (req, res) => {
       const cursor = cartDatabase.find()
       const result = await cursor.toArray()
       res.send(result)
-  })
+    })
 
-  app.delete('/cart/:id', async (req, res) => {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) }
-    const result = await cartDatabase.deleteOne(query)
-    res.send(result)
-  })
+    app.delete('/cart/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await cartDatabase.deleteOne(query)
+      res.send(result)
+    })
+
+    app.get('/addproduct/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await productDatabase.findOne(query)
+      res.send(result)
+
+    })
+
+    app.put('/addproduct/:id', async (req, res) => {
+      const id = req.params.id;
+      const product = req.body;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true }
+      const updatedProducts = {
+        $set: {
+          image: product.image,
+          name: product.name,
+          brand: product.brand,
+          category: product.category,
+          price: product.price,
+          description: product.description,
+          rating: product.rating
+        }
+      }
+      const result = await productDatabase.updateOne(filter, updatedProducts, options)
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -102,10 +130,10 @@ run().catch(console.dir);
 
 
 
-app.get('/', (req, res)=>{
-    res.send('Hello from server')
+app.get('/', (req, res) => {
+  res.send('Hello from server')
 })
 
-app.listen(port, ()=>{
-    console.log(`server is running on port: ${port}`);
+app.listen(port, () => {
+  console.log(`server is running on port: ${port}`);
 })
